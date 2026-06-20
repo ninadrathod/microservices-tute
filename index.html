@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="A beginner-friendly tutorial on Microservices, APIs, FastAPI, uvicorn, and CI/CD automation." />
+  <title>Microservices &amp; APIs Tutorial | FastAPI &amp; CI/CD</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            display: ['Outfit', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'ui-monospace', 'monospace'],
+          },
+          colors: {
+            accent: { DEFAULT: '#6366f1', dark: '#4f46e5' }
+          },
+          animation: {
+            'float': 'float 8s ease-in-out infinite',
+            'float-delayed': 'float 8s ease-in-out 3s infinite',
+            'pulse-glow': 'pulse-glow 4s ease-in-out infinite',
+            'fade-up': 'fade-up 0.6s ease-out forwards',
+          },
+          keyframes: {
+            float: {
+              '0%, 100%': { transform: 'translateY(0px)' },
+              '50%': { transform: 'translateY(-18px)' },
+            },
+            'pulse-glow': {
+              '0%, 100%': { opacity: '0.4' },
+              '50%': { opacity: '0.7' },
+            },
+            'fade-up': {
+              '0%': { opacity: '0', transform: 'translateY(16px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' },
+            },
+          },
+        }
+      }
+    };
+  </script>
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; }
+    h1, h2, h3, .font-display { font-family: 'Outfit', system-ui, sans-serif; }
+
+    .mesh-bg {
+      background-color: #020617;
+      background-image:
+        radial-gradient(ellipse 80% 60% at 10% -10%, rgba(99, 102, 241, 0.18), transparent 50%),
+        radial-gradient(ellipse 60% 50% at 90% 10%, rgba(16, 185, 129, 0.12), transparent 45%),
+        radial-gradient(ellipse 50% 40% at 50% 100%, rgba(139, 92, 246, 0.1), transparent 50%),
+        linear-gradient(rgba(148, 163, 184, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(148, 163, 184, 0.03) 1px, transparent 1px);
+      background-size: auto, auto, auto, 48px 48px, 48px 48px;
+    }
+
+    .glass-card {
+      background: linear-gradient(135deg, rgba(30, 41, 59, 0.7), rgba(15, 23, 42, 0.5));
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(148, 163, 184, 0.1);
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+      transition: border-color 0.25s, box-shadow 0.25s, transform 0.25s;
+    }
+    .glass-card:hover {
+      border-color: rgba(99, 102, 241, 0.25);
+      box-shadow: 0 8px 32px rgba(99, 102, 241, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    }
+
+    .gradient-text {
+      background: linear-gradient(135deg, #fff 0%, #c7d2fe 40%, #6ee7b7 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .gradient-border {
+      position: relative;
+    }
+    .gradient-border::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      padding: 1px;
+      background: linear-gradient(135deg, rgba(99,102,241,0.5), rgba(52,211,153,0.3), rgba(99,102,241,0.1));
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+    }
+
+    .code-window {
+      background: linear-gradient(180deg, #0f172a 0%, #020617 100%);
+      border: 1px solid rgba(99, 102, 241, 0.15);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255,255,255,0.03);
+    }
+    .code-window .dots span { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+
+    .section-glow {
+      box-shadow: 0 0 60px rgba(99, 102, 241, 0.06);
+    }
+
+    .toc-link.active {
+      background: linear-gradient(90deg, rgba(99,102,241,0.15), transparent);
+      border-left: 2px solid #818cf8;
+      color: #c7d2fe !important;
+    }
+
+    #scroll-progress {
+      transform-origin: left;
+      transform: scaleX(0);
+      transition: transform 0.1s linear;
+    }
+
+    details summary::-webkit-details-marker { display: none; }
+    details[open] summary { color: #a5b4fc; }
+
+    .reveal-section {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    .reveal-section.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+      z-index: 0;
+    }
+  </style>
+</head>
+<body class="mesh-bg text-slate-200 antialiased relative overflow-x-hidden">
+
+  <!-- Ambient orbs -->
+  <div class="orb w-96 h-96 bg-indigo-600/20 -top-48 -left-48 animate-pulse-glow" aria-hidden="true"></div>
+  <div class="orb w-80 h-80 bg-emerald-500/15 top-1/3 -right-40 animate-float" aria-hidden="true"></div>
+  <div class="orb w-72 h-72 bg-violet-600/10 bottom-20 left-1/4 animate-float-delayed" aria-hidden="true"></div>
+
+  <!-- Scroll progress -->
+  <div class="fixed top-0 left-0 right-0 h-0.5 z-[60] bg-slate-800">
+    <div id="scroll-progress" class="h-full bg-gradient-to-r from-indigo-500 via-violet-500 to-emerald-400"></div>
+  </div>
+
+  <!-- Mobile sticky top bar -->
+  <header class="lg:hidden sticky top-0.5 z-50 mx-3 mt-2 rounded-2xl bg-slate-900/80 backdrop-blur-xl border border-white/10 shadow-xl shadow-black/30">
+    <div class="flex items-center justify-between px-4 py-3">
+      <a href="#top" class="flex items-center gap-2.5 font-display font-semibold text-white text-sm tracking-tight">
+        <span class="flex items-center justify-center w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 text-white text-xs font-bold shadow-lg shadow-indigo-500/30">API</span>
+        Microservices &amp; APIs
+      </a>
+      <button id="menu-toggle" type="button" aria-label="Open navigation menu"
+        class="p-2.5 rounded-xl text-slate-300 hover:bg-white/10 hover:text-white transition">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path id="menu-icon-open" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+          <path id="menu-icon-close" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+    <nav id="mobile-nav" class="hidden border-t border-white/10 max-h-[70vh] overflow-y-auto rounded-b-2xl">
+      <ul class="py-3 px-2 space-y-0.5" id="mobile-toc"></ul>
+    </nav>
+  </header>
+
+  <div class="lg:flex min-h-screen relative z-10" id="top">
+
+    <!-- Desktop sidebar TOC -->
+    <aside class="hidden lg:block lg:w-72 xl:w-80 shrink-0">
+      <nav class="sticky top-0 h-screen overflow-y-auto border-r border-white/5 bg-slate-950/60 backdrop-blur-xl p-6">
+        <div class="flex items-center gap-3 mb-6">
+          <span class="flex items-center justify-center w-10 h-10 rounded-2xl bg-gradient-to-br from-indigo-500 to-emerald-500 text-white font-display font-bold text-sm shadow-lg shadow-indigo-500/25">API</span>
+          <div>
+            <p class="font-display font-semibold text-white text-sm leading-tight">Microservices</p>
+            <p class="text-xs text-slate-500">FastAPI · CI/CD</p>
+          </div>
+        </div>
+        <p class="text-[10px] font-semibold uppercase tracking-[0.2em] text-indigo-400/80 mb-3">On this page</p>
+        <ul class="space-y-0.5 text-sm mb-6" id="desktop-toc"></ul>
+        <div class="rounded-2xl glass-card p-4 mt-auto">
+          <p class="text-xs text-slate-500 mb-2">Your progress</p>
+          <div class="h-1.5 rounded-full bg-slate-800 overflow-hidden">
+            <div id="sidebar-progress" class="h-full rounded-full bg-gradient-to-r from-indigo-500 to-emerald-400 transition-all duration-300" style="width: 0%"></div>
+          </div>
+          <p class="text-[11px] text-slate-500 mt-2"><span id="progress-label">0</span>% complete</p>
+        </div>
+      </nav>
+    </aside>
+
+    <!-- Main content -->
+    <main class="flex-1 min-w-0">
+      <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-10 py-10 lg:py-14">
+
+        <!-- Hero -->
+        <header class="mb-16 relative">
+          <div class="flex flex-wrap gap-2 mb-5">
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-indigo-500/15 text-indigo-300 border border-indigo-500/20">
+              <span class="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse"></span>
+              Beginner-friendly
+            </span>
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">FastAPI + uvicorn</span>
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-violet-500/10 text-violet-300 border border-violet-500/20">100 quiz questions</span>
+          </div>
+          <h1 class="font-display text-4xl sm:text-5xl lg:text-[3.25rem] font-extrabold tracking-tight mb-5 leading-[1.1]">
+            <span class="gradient-text">Microservices, APIs</span><br />
+            <span class="text-white">&amp; CI/CD</span>
+          </h1>
+          <p class="text-slate-400 text-lg sm:text-xl leading-relaxed max-w-2xl mb-8">
+            Learn how software talks to software — from REST fundamentals to hands-on FastAPI endpoints and automated deployments.
+          </p>
+          <div class="grid grid-cols-3 gap-3 max-w-md">
+            <div class="glass-card rounded-2xl p-4 text-center gradient-border">
+              <p class="font-display text-2xl font-bold text-white">10</p>
+              <p class="text-[11px] text-slate-500 uppercase tracking-wider mt-0.5">Sections</p>
+            </div>
+            <div class="glass-card rounded-2xl p-4 text-center gradient-border">
+              <p class="font-display text-2xl font-bold text-emerald-400">100</p>
+              <p class="text-[11px] text-slate-500 uppercase tracking-wider mt-0.5">MCQs</p>
+            </div>
+            <div class="glass-card rounded-2xl p-4 text-center gradient-border">
+              <p class="font-display text-2xl font-bold text-indigo-400">CRUD</p>
+              <p class="text-[11px] text-slate-500 uppercase tracking-wider mt-0.5">Examples</p>
+            </div>
+          </div>
+        </header>
+
+        <!-- Section 1: Prerequisites -->
+        <section id="prerequisites" class="scroll-mt-24 mb-20 reveal-section section-glow rounded-3xl p-1">
+          <div class="glass-card rounded-3xl p-6 sm:p-8">
+          <div class="flex items-center gap-4 mb-6">
+            <span class="flex-shrink-0 w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500/30 to-violet-600/20 border border-indigo-400/30 flex items-center justify-center font-display font-bold text-indigo-200 text-lg shadow-lg shadow-indigo-500/10">01</span>
+            <div>
+              <p class="text-[10px] uppercase tracking-[0.2em] text-slate-500 mb-0.5">Foundation</p>
+              <h2 class="font-display text-2xl sm:text-3xl font-bold text-white">Prerequisites</h2>
+            </div>
+          </div>
+          <p class="text-slate-400 mb-6 leading-relaxed">
+            Before diving in, make sure you have a few basics in place. Think of these as the tools in your
+            toolbox — you don't need to be an expert, but familiarity helps.
+          </p>
+          <div class="grid sm:grid-cols-2 gap-4 mb-8">
+            <div class="glass-card rounded-2xl p-5 hover:-translate-y-0.5 transition-transform">
+              <div class="w-9 h-9 rounded-xl bg-indigo-500/15 flex items-center justify-center mb-3 text-lg">📚</div>
+              <h3 class="font-display font-semibold text-white mb-2">Required knowledge</h3>
+              <ul class="text-slate-400 text-sm space-y-2 list-disc list-inside">
+                <li>Basic computer literacy (files, folders, browsers)</li>
+                <li>Elementary programming concepts (variables, functions)</li>
+                <li>Comfort using a terminal / command line</li>
+              </ul>
+            </div>
+            <div class="glass-card rounded-2xl p-5 hover:-translate-y-0.5 transition-transform">
+              <div class="w-9 h-9 rounded-xl bg-emerald-500/15 flex items-center justify-center mb-3 text-lg">🛠️</div>
+              <h3 class="font-display font-semibold text-white mb-2">Tools to install</h3>
+              <ul class="text-slate-400 text-sm space-y-2 list-disc list-inside">
+                <li><strong class="text-slate-300">Python 3.10+</strong> — <a href="https://python.org" class="text-indigo-400 hover:underline">python.org</a></li>
+                <li><strong class="text-slate-300">pip</strong> — comes with Python</li>
+                <li><strong class="text-slate-300">A code editor</strong> — VS Code, Cursor, etc.</li>
+                <li><strong class="text-slate-300">Git</strong> — for version control &amp; CI/CD</li>
+              </ul>
+            </div>
+          </div>
+          <div class="rounded-2xl p-5 mb-6 bg-gradient-to-r from-emerald-500/10 via-transparent to-indigo-500/10 border border-emerald-500/20">
+            <p class="text-slate-300 text-sm leading-relaxed">
+              <strong class="text-emerald-400">Quick start check:</strong> Open a terminal and run
+              <code class="font-mono bg-slate-900/80 px-2.5 py-1 rounded-lg text-emerald-300 border border-emerald-500/20">python --version</code>.
+              If you see a version number, you're ready to proceed.
+            </p>
+          </div>
+          <div id="quiz-prerequisites" class="quiz-section" data-section="prerequisites"></div>
+          </div>
+        </section>
+
+        <!-- Section 2: What is an API? -->
+        <section id="what-is-api" class="scroll-mt-24 mb-20 reveal-section">
+          <div class="glass-card rounded-3xl p-6 sm:p-8">
+          <div class="flex items-center gap-4 mb-6">
+            <span class="flex-shrink-0 w-12 h-12 rounded-2xl bg-gradient-to-br from-sky-500/30 to-indigo-600/20 border border-sky-400/30 flex items-center justify-center font-display font-bold text-sky-200 text-lg">02</span>
+            <div>
+              <p class="text-[10px] uppercase tracking-[0.2em] text-slate-500 mb-0.5">Core concept</p>
+              <h2 class="font-display text-2xl sm:text-3xl font-bold text-white">What Is an API?</h2>
+            </div>
+          </div>
+          <p class="text-slate-400 mb-4 leading-relaxed">
+            <strong class="text-slate-200">API</strong> stands for <em>Application Programming Interface</em>.
+            In plain English: it's a menu that one program offers to another. Your app doesn't need to know
+            <em>how</em> the kitchen cooks — it just orders from the menu and gets a result back.
+          </p>
+          <p class="text-slate-400 mb-6 leading-relaxed">
+            When you use a weather app, it doesn't measure temperature itself. It calls a weather service's API:
+            "Give me the forecast for London." The API returns structured data (usually JSON), and the app displays it.
+          </p>
+
+          <!-- API diagram -->
+          <figure class="glass-card rounded-2xl p-6 mb-8 gradient-border overflow-hidden">
+            <figcaption class="text-[10px] uppercase tracking-[0.2em] text-indigo-400/70 mb-4 font-medium">Client ↔ Server API flow</figcaption>
+            <svg viewBox="0 0 640 200" class="w-full h-auto" role="img" aria-label="Diagram showing a client app sending a request to an API server and receiving a response">
+              <defs>
+                <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                  <path d="M0,0 L6,3 L0,6 Z" fill="#818cf8"/>
+                </marker>
+              </defs>
+              <rect x="40" y="60" width="140" height="80" rx="12" fill="#1e293b" stroke="#6366f1" stroke-width="2"/>
+              <text x="110" y="95" text-anchor="middle" fill="#e2e8f0" font-size="14" font-weight="600">Client App</text>
+              <text x="110" y="118" text-anchor="middle" fill="#94a3b8" font-size="11">(Browser / Mobile)</text>
+              <rect x="460" y="60" width="140" height="80" rx="12" fill="#1e293b" stroke="#34d399" stroke-width="2"/>
+              <text x="530" y="95" text-anchor="middle" fill="#e2e8f0" font-size="14" font-weight="600">API Server</text>
+              <text x="530" y="118" text-anchor="middle" fill="#94a3b8" font-size="11">(Backend)</text>
+              <line x1="185" y1="90" x2="455" y2="90" stroke="#818cf8" stroke-width="2" marker-end="url(#arrow)"/>
+              <text x="320" y="80" text-anchor="middle" fill="#a5b4fc" font-size="12">HTTP Request</text>
+              <line x1="455" y1="120" x2="185" y2="120" stroke="#34d399" stroke-width="2" marker-end="url(#arrow)"/>
+              <text x="320" y="140" text-anchor="middle" fill="#6ee7b7" font-size="12">JSON Response</text>
+            </svg>
+          </figure>
+
+          <div id="quiz-what-is-api" class="quiz-section" data-section="what-is-api"></div>
+          </div>
+        </section>
+
+        <!-- Section 3: REST & HTTP -->
+        <section id="rest-http" class="scroll-mt-24 mb-20 reveal-section">
+          <div class="glass-card rounded-3xl p-6 sm:p-8">
+          <div class="flex items-center gap-4 mb-6">
+            <span class="flex-shrink-0 w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-500/30 to-teal-600/20 border border-emerald-400/30 flex items-center justify-center font-display font-bold text-emerald-200 text-lg">03</span>
+            <div>
+              <p class="text-[10px] uppercase tracking-[0.2em] text-slate-500 mb-0.5">Web standards</p>
+              <h2 class="font-display text-2xl sm:text-3xl font-bold text-white">REST &amp; HTTP Methods</h2>
+            </div>
+          </div>
+          <p class="text-slate-400 mb-4 leading-relaxed">
+            <strong class="text-slate-200">REST</strong> (Representational State Transfer) is a popular style for
+            building web APIs. Resources (users, orders, products) are identified by URLs, and you use standard
+            <strong class="text-slate-200">HTTP methods</strong> to act on them — like verbs in a sentence.
+          </p>
+
+          <div class="overflow-x-auto mb-8 rounded-2xl border border-white/10 overflow-hidden">
+            <table class="w-full text-sm">
+              <thead class="bg-gradient-to-r from-slate-800/80 to-slate-900/80">
+                <tr>
+                  <th class="text-left p-4 text-slate-300 font-display font-semibold">Method</th>
+                  <th class="text-left p-4 text-slate-300 font-display font-semibold">Purpose</th>
+                  <th class="text-left p-4 text-slate-300 font-display font-semibold">Analogy</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-white/5">
+                <tr class="bg-slate-900/40 hover:bg-indigo-500/5 transition"><td class="p-4"><span class="font-mono text-xs font-semibold px-2.5 py-1 rounded-lg bg-emerald-500/15 text-emerald-300 border border-emerald-500/20">GET</span></td><td class="p-4 text-slate-400">Read data</td><td class="p-4 text-slate-500">Look at a menu</td></tr>
+                <tr class="hover:bg-indigo-500/5 transition"><td class="p-4"><span class="font-mono text-xs font-semibold px-2.5 py-1 rounded-lg bg-indigo-500/15 text-indigo-300 border border-indigo-500/20">POST</span></td><td class="p-4 text-slate-400">Create new data</td><td class="p-4 text-slate-500">Place a new order</td></tr>
+                <tr class="bg-slate-900/40 hover:bg-indigo-500/5 transition"><td class="p-4"><span class="font-mono text-xs font-semibold px-2.5 py-1 rounded-lg bg-amber-500/15 text-amber-300 border border-amber-500/20">PUT / PATCH</span></td><td class="p-4 text-slate-400">Update existing data</td><td class="p-4 text-slate-500">Change your order</td></tr>
+                <tr class="hover:bg-indigo-500/5 transition"><td class="p-4"><span class="font-mono text-xs font-semibold px-2.5 py-1 rounded-lg bg-rose-500/15 text-rose-300 border border-rose-500/20">DELETE</span></td><td class="p-4 text-slate-400">Remove data</td><td class="p-4 text-slate-500">Cancel the order</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <figure class="glass-card rounded-2xl p-6 mb-8 gradient-border">
+            <figcaption class="text-[10px] uppercase tracking-[0.2em] text-indigo-400/70 mb-4 font-medium">REST resource lifecycle</figcaption>
+            <svg viewBox="0 0 640 120" class="w-full h-auto" role="img" aria-label="Flowchart of CRUD operations on a resource">
+              <rect x="20" y="40" width="100" height="44" rx="8" fill="#064e3b" stroke="#34d399"/>
+              <text x="70" y="67" text-anchor="middle" fill="#6ee7b7" font-size="12" font-weight="600">POST</text>
+              <text x="70" y="105" text-anchor="middle" fill="#64748b" font-size="10">Create</text>
+              <rect x="150" y="40" width="100" height="44" rx="8" fill="#1e3a5f" stroke="#60a5fa"/>
+              <text x="200" y="67" text-anchor="middle" fill="#93c5fd" font-size="12" font-weight="600">GET</text>
+              <text x="200" y="105" text-anchor="middle" fill="#64748b" font-size="10">Read</text>
+              <rect x="280" y="40" width="100" height="44" rx="8" fill="#422006" stroke="#fbbf24"/>
+              <text x="330" y="67" text-anchor="middle" fill="#fcd34d" font-size="12" font-weight="600">PUT</text>
+              <text x="330" y="105" text-anchor="middle" fill="#64748b" font-size="10">Update</text>
+              <rect x="410" y="40" width="100" height="44" rx="8" fill="#4c0519" stroke="#fb7185"/>
+              <text x="460" y="67" text-anchor="middle" fill="#fda4af" font-size="12" font-weight="600">DELETE</text>
+              <text x="460" y="105" text-anchor="middle" fill="#64748b" font-size="10">Remove</text>
+              <rect x="540" y="40" width="80" height="44" rx="8" fill="#1e293b" stroke="#94a3b8"/>
+              <text x="580" y="67" text-anchor="middle" fill="#e2e8f0" font-size="11">/items</text>
+              <path d="M120 62 L150 62" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+              <path d="M250 62 L280 62" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+              <path d="M380 62 L410 62" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+              <path d="M510 62 L540 62" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+            </svg>
+          </figure>
+
+          <p class="text-slate-400 mb-6 leading-relaxed">
+            Status codes tell you what happened: <code class="font-mono bg-emerald-500/10 px-1.5 py-0.5 rounded text-emerald-300 border border-emerald-500/20">200 OK</code> means success,
+            <code class="font-mono bg-amber-500/10 px-1.5 py-0.5 rounded text-amber-300 border border-amber-500/20">404 Not Found</code> means the resource doesn't exist,
+            and <code class="font-mono bg-rose-500/10 px-1.5 py-0.5 rounded text-rose-300 border border-rose-500/20">500 Server Error</code> means something broke on the server.
+          </p>
+          <div id="quiz-rest-http" class="quiz-section" data-section="rest-http"></div>
+          </div>
+        </section>
+
+        <!-- Section 4: Microservices -->
+        <section id="microservices" class="scroll-mt-24 mb-20 reveal-section">
+          <div class="glass-card rounded-3xl p-6 sm:p-8">
+          <div class="flex items-center gap-4 mb-6">
+            <span class="flex-shrink-0 w-12 h-12 rounded-2xl bg-gradient-to-br from-violet-500/30 to-purple-600/20 border border-violet-400/30 flex items-center justify-center font-display font-bold text-violet-200 text-lg">04</span>
+            <div>
+              <p class="text-[10px] uppercase tracking-[0.2em] text-slate-500 mb-0.5">Architecture</p>
+              <h2 class="font-display text-2xl sm:text-3xl font-bold text-white">Introduction to Microservices</h2>
+            </div>
+          </div>
+          <p class="text-slate-400 mb-4 leading-relaxed">
+            Imagine a restaurant that used to be one giant kitchen where one chef did everything. A
+            <strong class="text-slate-200">monolith</strong> app works the same way — one big codebase handles users,
+            payments, inventory, and shipping.
+          </p>
+          <p class="text-slate-400 mb-6 leading-relaxed">
+            <strong class="text-slate-200">Microservices</strong> split that kitchen into specialized stations: a pastry
+            station, a grill, a salad bar. Each service is a small, independent app with its own database, deployed
+            and scaled separately. They talk to each other through APIs.
+          </p>
+
+          <figure class="glass-card rounded-2xl p-6 mb-8 gradient-border">
+            <figcaption class="text-[10px] uppercase tracking-[0.2em] text-indigo-400/70 mb-4 font-medium">Monolith vs. microservices</figcaption>
+            <svg viewBox="0 0 640 280" class="w-full h-auto" role="img" aria-label="Comparison of monolithic and microservices architecture">
+              <text x="160" y="24" text-anchor="middle" fill="#94a3b8" font-size="13" font-weight="600">Monolith</text>
+              <rect x="60" y="40" width="200" height="200" rx="12" fill="#1e293b" stroke="#64748b" stroke-width="2"/>
+              <text x="160" y="90" text-anchor="middle" fill="#cbd5e1" font-size="11">Users</text>
+              <text x="160" y="120" text-anchor="middle" fill="#cbd5e1" font-size="11">Orders</text>
+              <text x="160" y="150" text-anchor="middle" fill="#cbd5e1" font-size="11">Payments</text>
+              <text x="160" y="180" text-anchor="middle" fill="#cbd5e1" font-size="11">Inventory</text>
+              <text x="160" y="210" text-anchor="middle" fill="#64748b" font-size="10">Single database</text>
+              <text x="480" y="24" text-anchor="middle" fill="#94a3b8" font-size="13" font-weight="600">Microservices</text>
+              <rect x="360" y="50" width="90" height="50" rx="8" fill="#312e81" stroke="#818cf8"/>
+              <text x="405" y="80" text-anchor="middle" fill="#c7d2fe" font-size="10">User Svc</text>
+              <rect x="470" y="50" width="90" height="50" rx="8" fill="#312e81" stroke="#818cf8"/>
+              <text x="515" y="80" text-anchor="middle" fill="#c7d2fe" font-size="10">Order Svc</text>
+              <rect x="360" y="120" width="90" height="50" rx="8" fill="#064e3b" stroke="#34d399"/>
+              <text x="405" y="150" text-anchor="middle" fill="#6ee7b7" font-size="10">Pay Svc</text>
+              <rect x="470" y="120" width="90" height="50" rx="8" fill="#064e3b" stroke="#34d399"/>
+              <text x="515" y="150" text-anchor="middle" fill="#6ee7b7" font-size="10">Stock Svc</text>
+              <rect x="415" y="200" width="90" height="40" rx="8" fill="#1e293b" stroke="#94a3b8"/>
+              <text x="460" y="225" text-anchor="middle" fill="#94a3b8" font-size="10">API Gateway</text>
+              <line x1="405" y1="100" x2="460" y2="200" stroke="#475569" stroke-width="1.5"/>
+              <line x1="515" y1="100" x2="460" y2="200" stroke="#475569" stroke-width="1.5"/>
+              <line x1="405" y1="170" x2="460" y2="200" stroke="#475569" stroke-width="1.5"/>
+              <line x1="515" y1="170" x2="460" y2="200" stroke="#475569" stroke-width="1.5"/>
+            </svg>
+          </figure>
+
+          <div class="rounded-2xl p-5 mb-6 bg-gradient-to-br from-indigo-500/10 to-violet-500/5 border border-indigo-500/20">
+            <h3 class="font-display text-white font-semibold mb-3 flex items-center gap-2">
+              <span class="text-lg">⚖️</span> Benefits &amp; trade-offs
+            </h3>
+            <ul class="text-slate-400 text-sm space-y-2.5">
+              <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold mt-0.5">+</span> Teams can deploy services independently</li>
+              <li class="flex items-start gap-2"><span class="text-emerald-400 font-bold mt-0.5">+</span> Scale only the busy parts (e.g., payment service during sales)</li>
+              <li class="flex items-start gap-2"><span class="text-rose-400 font-bold mt-0.5">−</span> More moving parts = more DevOps complexity</li>
+              <li class="flex items-start gap-2"><span class="text-rose-400 font-bold mt-0.5">−</span> Network calls between services can fail — you need resilience patterns</li>
+            </ul>
+          </div>
+          <div id="quiz-microservices" class="quiz-section" data-section="microservices"></div>
+          </div>
+        </section>
+
+        <!-- Section 5: CI/CD -->
+        <section id="cicd-automation" class="scroll-mt-24 mb-20 reveal-section">
+          <div class="glass-card rounded-3xl p-6 sm:p-8">
+          <div class="flex items-center gap-4 mb-6">
+            <span class="flex-shrink-0 w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-500/30 to-orange-600/20 border border-amber-400/30 flex items-center justify-center font-display font-bold text-amber-200 text-lg">05</span>
+            <div>
+              <p class="text-[10px] uppercase tracking-[0.2em] text-slate-500 mb-0.5">DevOps</p>
+              <h2 class="font-display text-2xl sm:text-3xl font-bold text-white">CI/CD &amp; Automation</h2>
+            </div>
+          </div>
+          <p class="text-slate-400 mb-4 leading-relaxed">
+            <strong class="text-slate-200">CI/CD</strong> stands for <em>Continuous Integration</em> and
+            <em>Continuous Delivery/Deployment</em>. Instead of manually copying code to a server every Friday,
+            automation pipelines test and deploy your API whenever you push to Git.
+          </p>
+          <ul class="text-slate-400 space-y-2 mb-6 list-disc list-inside">
+            <li><strong class="text-slate-200">CI</strong> — automatically run tests &amp; lint on every commit</li>
+            <li><strong class="text-slate-200">CD</strong> — automatically deploy passing builds to staging or production</li>
+          </ul>
+
+          <figure class="glass-card rounded-2xl p-6 mb-8 gradient-border">
+            <figcaption class="text-[10px] uppercase tracking-[0.2em] text-indigo-400/70 mb-4 font-medium">Typical CI/CD pipeline</figcaption>
+            <svg viewBox="0 0 640 140" class="w-full h-auto" role="img" aria-label="CI/CD pipeline from code commit to production">
+              <rect x="10" y="45" width="90" height="50" rx="8" fill="#1e293b" stroke="#6366f1"/>
+              <text x="55" y="75" text-anchor="middle" fill="#c7d2fe" font-size="11">Git Push</text>
+              <rect x="120" y="45" width="90" height="50" rx="8" fill="#1e293b" stroke="#60a5fa"/>
+              <text x="165" y="75" text-anchor="middle" fill="#93c5fd" font-size="11">Build</text>
+              <rect x="230" y="45" width="90" height="50" rx="8" fill="#1e293b" stroke="#fbbf24"/>
+              <text x="275" y="68" text-anchor="middle" fill="#fcd34d" font-size="10">Test &amp;</text>
+              <text x="275" y="82" text-anchor="middle" fill="#fcd34d" font-size="10">Lint</text>
+              <rect x="340" y="45" width="90" height="50" rx="8" fill="#1e293b" stroke="#34d399"/>
+              <text x="385" y="75" text-anchor="middle" fill="#6ee7b7" font-size="11">Staging</text>
+              <rect x="450" y="45" width="90" height="50" rx="8" fill="#1e293b" stroke="#34d399"/>
+              <text x="495" y="75" text-anchor="middle" fill="#6ee7b7" font-size="11">Production</text>
+              <rect x="560" y="45" width="70" height="50" rx="8" fill="#312e81" stroke="#818cf8"/>
+              <text x="595" y="75" text-anchor="middle" fill="#c7d2fe" font-size="10">Monitor</text>
+              <path d="M100 70 L120 70" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+              <path d="M210 70 L230 70" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+              <path d="M320 70 L340 70" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+              <path d="M430 70 L450 70" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+              <path d="M540 70 L560 70" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+            </svg>
+          </figure>
+
+          <p class="text-slate-400 mb-6 leading-relaxed">
+            Popular tools: <strong class="text-slate-200">GitHub Actions</strong>, GitLab CI, Jenkins, CircleCI.
+            For APIs, pipelines often run unit tests with <code class="font-mono bg-indigo-500/10 px-1.5 py-0.5 rounded text-indigo-300 border border-indigo-500/20">pytest</code>,
+            build Docker images, and deploy to cloud platforms.
+          </p>
+          <div id="quiz-cicd-automation" class="quiz-section" data-section="cicd-automation"></div>
+          </div>
+        </section>
+
+        <!-- Section 6: FastAPI Setup -->
+        <section id="fastapi-setup" class="scroll-mt-24 mb-20 reveal-section">
+          <div class="glass-card rounded-3xl p-6 sm:p-8">
+          <div class="flex items-center gap-4 mb-6">
+            <span class="flex-shrink-0 w-12 h-12 rounded-2xl bg-gradient-to-br from-teal-500/30 to-emerald-600/20 border border-teal-400/30 flex items-center justify-center font-display font-bold text-teal-200 text-lg">06</span>
+            <div>
+              <p class="text-[10px] uppercase tracking-[0.2em] text-slate-500 mb-0.5">Hands-on</p>
+              <h2 class="font-display text-2xl sm:text-3xl font-bold text-white">FastAPI &amp; uvicorn Setup</h2>
+            </div>
+          </div>
+          <p class="text-slate-400 mb-4 leading-relaxed">
+            <strong class="text-slate-200">FastAPI</strong> is a modern Python framework for building APIs. It's fast,
+            automatically generates interactive docs, and uses Python type hints for validation.
+            <strong class="text-slate-200">uvicorn</strong> is the ASGI server that actually runs your FastAPI app.
+          </p>
+
+          <figure class="glass-card rounded-2xl p-6 mb-6 gradient-border">
+            <figcaption class="text-[10px] uppercase tracking-[0.2em] text-indigo-400/70 mb-4 font-medium">Request path through FastAPI</figcaption>
+            <svg viewBox="0 0 640 100" class="w-full h-auto" role="img" aria-label="FastAPI request lifecycle">
+              <rect x="10" y="30" width="110" height="44" rx="8" fill="#1e293b" stroke="#94a3b8"/>
+              <text x="65" y="57" text-anchor="middle" fill="#e2e8f0" font-size="11">HTTP Client</text>
+              <rect x="140" y="30" width="90" height="44" rx="8" fill="#312e81" stroke="#818cf8"/>
+              <text x="185" y="57" text-anchor="middle" fill="#c7d2fe" font-size="11">uvicorn</text>
+              <rect x="250" y="30" width="100" height="44" rx="8" fill="#064e3b" stroke="#34d399"/>
+              <text x="300" y="57" text-anchor="middle" fill="#6ee7b7" font-size="11">FastAPI</text>
+              <rect x="370" y="30" width="110" height="44" rx="8" fill="#1e293b" stroke="#fbbf24"/>
+              <text x="425" y="57" text-anchor="middle" fill="#fcd34d" font-size="11">Your Code</text>
+              <rect x="500" y="30" width="130" height="44" rx="8" fill="#1e293b" stroke="#94a3b8"/>
+              <text x="565" y="57" text-anchor="middle" fill="#e2e8f0" font-size="11">JSON Response</text>
+              <path d="M120 52 L140 52" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+              <path d="M230 52 L250 52" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+              <path d="M350 52 L370 52" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+              <path d="M480 52 L500 52" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+            </svg>
+          </figure>
+
+          <h3 class="font-display text-lg font-semibold text-white mb-3 flex items-center gap-2"><span class="w-1.5 h-5 rounded-full bg-indigo-500"></span>Installation</h3>
+          <div class="code-window rounded-2xl overflow-hidden mb-6">
+            <div class="flex items-center gap-2 px-4 py-2.5 border-b border-white/5 bg-slate-900/80">
+              <div class="dots flex gap-1.5"><span class="bg-rose-500"></span><span class="bg-amber-400"></span><span class="bg-emerald-500"></span></div>
+              <span class="text-[11px] text-slate-500 font-mono ml-2">terminal</span>
+            </div>
+            <pre class="p-4 text-sm overflow-x-auto"><code class="font-mono text-emerald-300">pip install fastapi uvicorn[standard]</code></pre>
+          </div>
+
+          <h3 class="font-display text-lg font-semibold text-white mb-3 flex items-center gap-2"><span class="w-1.5 h-5 rounded-full bg-emerald-500"></span>Minimal app (<code class="text-sm font-mono text-indigo-300">main.py</code>)</h3>
+          <div class="code-window rounded-2xl overflow-hidden mb-4">
+            <div class="flex items-center gap-2 px-4 py-2.5 border-b border-white/5 bg-slate-900/80">
+              <div class="dots flex gap-1.5"><span class="bg-rose-500"></span><span class="bg-amber-400"></span><span class="bg-emerald-500"></span></div>
+              <span class="text-[11px] text-slate-500 font-mono ml-2">main.py</span>
+            </div>
+            <pre class="p-4 text-sm overflow-x-auto"><code class="font-mono text-slate-300"><span class="text-indigo-400">from</span> fastapi <span class="text-indigo-400">import</span> FastAPI
+
+app = FastAPI(title=<span class="text-amber-300">"My API"</span>)
+
+<span class="text-slate-500">@app.get("/")</span>
+<span class="text-indigo-400">def</span> <span class="text-sky-300">read_root</span>():
+    <span class="text-indigo-400">return</span> {<span class="text-amber-300">"message"</span>: <span class="text-amber-300">"Hello, API!"</span>}</code></pre>
+          </div>
+
+          <h3 class="font-display text-lg font-semibold text-white mb-3 flex items-center gap-2"><span class="w-1.5 h-5 rounded-full bg-violet-500"></span>Run with uvicorn</h3>
+          <div class="code-window rounded-2xl overflow-hidden mb-4">
+            <div class="flex items-center gap-2 px-4 py-2.5 border-b border-white/5 bg-slate-900/80">
+              <div class="dots flex gap-1.5"><span class="bg-rose-500"></span><span class="bg-amber-400"></span><span class="bg-emerald-500"></span></div>
+              <span class="text-[11px] text-slate-500 font-mono ml-2">terminal</span>
+            </div>
+            <pre class="p-4 text-sm overflow-x-auto"><code class="font-mono text-emerald-300">uvicorn main:app --reload --host 0.0.0.0 --port 8000</code></pre>
+          </div>
+          <p class="text-slate-400 text-sm mb-6">
+            Visit <code class="font-mono bg-indigo-500/10 px-2 py-0.5 rounded-lg text-indigo-300 border border-indigo-500/20">http://127.0.0.1:8000/docs</code> for auto-generated Swagger UI.
+          </p>
+          <div id="quiz-fastapi-setup" class="quiz-section" data-section="fastapi-setup"></div>
+          </div>
+        </section>
+
+        <!-- Section 7: GET -->
+        <section id="get-endpoints" class="scroll-mt-24 mb-20 reveal-section">
+          <div class="glass-card rounded-3xl p-6 sm:p-8">
+          <div class="flex items-center gap-4 mb-6">
+            <span class="flex-shrink-0 w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-500/30 to-green-600/20 border border-emerald-400/30 flex items-center justify-center font-display font-bold text-emerald-200 text-sm">GET</span>
+            <div>
+              <p class="text-[10px] uppercase tracking-[0.2em] text-slate-500 mb-0.5">Section 07</p>
+              <h2 class="font-display text-2xl sm:text-3xl font-bold text-white">GET Endpoints — Reading Data</h2>
+            </div>
+          </div>
+          <p class="text-slate-400 mb-4 leading-relaxed">
+            GET requests retrieve data without changing anything. Use path parameters for specific resources
+            and query parameters for filtering.
+          </p>
+
+          <div class="code-window rounded-2xl overflow-hidden mb-4">
+            <div class="flex items-center justify-between px-4 py-2.5 border-b border-white/5 bg-slate-900/80">
+              <div class="flex items-center gap-2">
+                <div class="dots flex gap-1.5"><span class="bg-rose-500"></span><span class="bg-amber-400"></span><span class="bg-emerald-500"></span></div>
+                <span class="text-[11px] text-slate-500 font-mono ml-2">main.py</span>
+              </div>
+              <span class="text-[10px] font-mono font-semibold px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/20">GET</span>
+            </div>
+            <pre class="p-4 text-sm overflow-x-auto"><code class="font-mono text-slate-300"><span class="text-indigo-400">from</span> fastapi <span class="text-indigo-400">import</span> FastAPI
+<span class="text-indigo-400">from</span> typing <span class="text-indigo-400">import</span> List
+
+app = FastAPI()
+
+<span class="text-slate-500"># In-memory "database" for learning</span>
+items_db = [
+    {<span class="text-amber-300">"id"</span>: <span class="text-rose-300">1</span>, <span class="text-amber-300">"name"</span>: <span class="text-amber-300">"Laptop"</span>, <span class="text-amber-300">"price"</span>: <span class="text-rose-300">999.99</span>},
+    {<span class="text-amber-300">"id"</span>: <span class="text-rose-300">2</span>, <span class="text-amber-300">"name"</span>: <span class="text-amber-300">"Mouse"</span>, <span class="text-amber-300">"price"</span>: <span class="text-rose-300">29.99</span>},
+]
+
+<span class="text-slate-500">@app.get("/items", response_model=List[dict])</span>
+<span class="text-indigo-400">def</span> <span class="text-sky-300">list_items</span>(skip: int = <span class="text-rose-300">0</span>, limit: int = <span class="text-rose-300">10</span>):
+    <span class="text-slate-500">"""GET all items with pagination."""</span>
+    <span class="text-indigo-400">return</span> items_db[skip : skip + limit]
+
+<span class="text-slate-500">@app.get("/items/{item_id}")</span>
+<span class="text-indigo-400">def</span> <span class="text-sky-300">get_item</span>(item_id: int):
+    <span class="text-slate-500">"""GET a single item by ID."""</span>
+    <span class="text-indigo-400">for</span> item <span class="text-indigo-400">in</span> items_db:
+        <span class="text-indigo-400">if</span> item[<span class="text-amber-300">"id"</span>] == item_id:
+            <span class="text-indigo-400">return</span> item
+    <span class="text-indigo-400">from</span> fastapi <span class="text-indigo-400">import</span> HTTPException
+    <span class="text-indigo-400">raise</span> HTTPException(status_code=<span class="text-rose-300">404</span>, detail=<span class="text-amber-300">"Item not found"</span>)</code></pre>
+          </div>
+
+          <div class="rounded-2xl p-4 mb-6 text-sm bg-gradient-to-r from-emerald-500/5 to-indigo-500/5 border border-white/10">
+            <p class="text-slate-300 font-medium mb-2 flex items-center gap-2"><span class="text-base">🚀</span> Try it</p>
+            <code class="font-mono text-emerald-300 block mt-1 bg-slate-900/60 rounded-lg px-3 py-2 border border-white/5">curl http://localhost:8000/items</code>
+            <code class="font-mono text-emerald-300 block mt-2 bg-slate-900/60 rounded-lg px-3 py-2 border border-white/5">curl http://localhost:8000/items/1</code>
+          </div>
+          <div id="quiz-get-endpoints" class="quiz-section" data-section="get-endpoints"></div>
+          </div>
+        </section>
+
+        <!-- Section 8: POST -->
+        <section id="post-endpoints" class="scroll-mt-24 mb-20 reveal-section">
+          <div class="glass-card rounded-3xl p-6 sm:p-8">
+          <div class="flex items-center gap-4 mb-6">
+            <span class="flex-shrink-0 w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500/30 to-blue-600/20 border border-indigo-400/30 flex items-center justify-center font-display font-bold text-indigo-200 text-sm">POST</span>
+            <div>
+              <p class="text-[10px] uppercase tracking-[0.2em] text-slate-500 mb-0.5">Section 08</p>
+              <h2 class="font-display text-2xl sm:text-3xl font-bold text-white">POST Endpoints — Creating Data</h2>
+            </div>
+          </div>
+          <p class="text-slate-400 mb-4 leading-relaxed">
+            POST sends a JSON body to create a new resource. FastAPI uses Pydantic models to validate
+            incoming data automatically.
+          </p>
+
+          <div class="code-window rounded-2xl overflow-hidden mb-4">
+            <div class="flex items-center justify-between px-4 py-2.5 border-b border-white/5 bg-slate-900/80">
+              <div class="flex items-center gap-2">
+                <div class="dots flex gap-1.5"><span class="bg-rose-500"></span><span class="bg-amber-400"></span><span class="bg-emerald-500"></span></div>
+                <span class="text-[11px] text-slate-500 font-mono ml-2">main.py</span>
+              </div>
+              <span class="text-[10px] font-mono font-semibold px-2 py-0.5 rounded bg-indigo-500/15 text-indigo-400 border border-indigo-500/20">POST</span>
+            </div>
+            <pre class="p-4 text-sm overflow-x-auto"><code class="font-mono text-slate-300"><span class="text-indigo-400">from</span> fastapi <span class="text-indigo-400">import</span> FastAPI, status
+<span class="text-indigo-400">from</span> pydantic <span class="text-indigo-400">import</span> BaseModel
+
+app = FastAPI()
+items_db = []
+next_id = <span class="text-rose-300">1</span>
+
+<span class="text-indigo-400">class</span> <span class="text-sky-300">ItemCreate</span>(BaseModel):
+    name: str
+    price: float
+
+<span class="text-slate-500">@app.post("/items", status_code=status.HTTP_201_CREATED)</span>
+<span class="text-indigo-400">def</span> <span class="text-sky-300">create_item</span>(item: ItemCreate):
+    <span class="text-indigo-400">global</span> next_id
+    new_item = {<span class="text-amber-300">"id"</span>: next_id, **item.model_dump()}
+    items_db.append(new_item)
+    next_id += <span class="text-rose-300">1</span>
+    <span class="text-indigo-400">return</span> new_item</code></pre>
+          </div>
+
+          <div class="rounded-2xl p-4 mb-6 text-sm bg-gradient-to-r from-indigo-500/5 to-violet-500/5 border border-white/10">
+            <p class="text-slate-300 font-medium mb-2 flex items-center gap-2"><span class="text-base">🚀</span> Try it</p>
+            <code class="font-mono text-emerald-300 block mt-1 bg-slate-900/60 rounded-lg px-3 py-2 border border-white/5 whitespace-pre-wrap">curl -X POST http://localhost:8000/items \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Keyboard", "price": 79.99}'</code>
+          </div>
+          <div id="quiz-post-endpoints" class="quiz-section" data-section="post-endpoints"></div>
+          </div>
+        </section>
+
+        <!-- Section 9: PUT/PATCH & DELETE -->
+        <section id="edit-delete-endpoints" class="scroll-mt-24 mb-20 reveal-section">
+          <div class="glass-card rounded-3xl p-6 sm:p-8">
+          <div class="flex items-center gap-4 mb-6">
+            <span class="flex-shrink-0 w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-500/30 to-rose-600/20 border border-amber-400/30 flex items-center justify-center font-display font-bold text-amber-200 text-[10px] leading-tight text-center px-1">PUT<br/>DEL</span>
+            <div>
+              <p class="text-[10px] uppercase tracking-[0.2em] text-slate-500 mb-0.5">Section 09</p>
+              <h2 class="font-display text-2xl sm:text-3xl font-bold text-white">PUT/PATCH &amp; DELETE — Edit &amp; Remove</h2>
+            </div>
+          </div>
+          <p class="text-slate-400 mb-4 leading-relaxed">
+            <strong class="text-slate-200">PUT</strong> replaces an entire resource; <strong class="text-slate-200">PATCH</strong>
+            updates only the fields you send. <strong class="text-slate-200">DELETE</strong> removes a resource.
+          </p>
+
+          <div class="code-window rounded-2xl overflow-hidden mb-4">
+            <div class="flex items-center justify-between px-4 py-2.5 border-b border-white/5 bg-slate-900/80">
+              <div class="flex items-center gap-2">
+                <div class="dots flex gap-1.5"><span class="bg-rose-500"></span><span class="bg-amber-400"></span><span class="bg-emerald-500"></span></div>
+                <span class="text-[11px] text-slate-500 font-mono ml-2">main.py</span>
+              </div>
+              <div class="flex gap-1">
+                <span class="text-[10px] font-mono font-semibold px-2 py-0.5 rounded bg-amber-500/15 text-amber-400 border border-amber-500/20">PATCH</span>
+                <span class="text-[10px] font-mono font-semibold px-2 py-0.5 rounded bg-rose-500/15 text-rose-400 border border-rose-500/20">DELETE</span>
+              </div>
+            </div>
+            <pre class="p-4 text-sm overflow-x-auto"><code class="font-mono text-slate-300"><span class="text-indigo-400">from</span> fastapi <span class="text-indigo-400">import</span> FastAPI, HTTPException
+<span class="text-indigo-400">from</span> pydantic <span class="text-indigo-400">import</span> BaseModel
+<span class="text-indigo-400">from</span> typing <span class="text-indigo-400">import</span> Optional
+
+app = FastAPI()
+items_db = [{<span class="text-amber-300">"id"</span>: <span class="text-rose-300">1</span>, <span class="text-amber-300">"name"</span>: <span class="text-amber-300">"Laptop"</span>, <span class="text-amber-300">"price"</span>: <span class="text-rose-300">999.99</span>}]
+
+<span class="text-indigo-400">class</span> <span class="text-sky-300">ItemUpdate</span>(BaseModel):
+    name: Optional[str] = <span class="text-indigo-400">None</span>
+    price: Optional[float] = <span class="text-indigo-400">None</span>
+
+<span class="text-indigo-400">def</span> <span class="text-sky-300">find_item</span>(item_id: int):
+    <span class="text-indigo-400">for</span> i, item <span class="text-indigo-400">in</span> enumerate(items_db):
+        <span class="text-indigo-400">if</span> item[<span class="text-amber-300">"id"</span>] == item_id:
+            <span class="text-indigo-400">return</span> i, item
+    <span class="text-indigo-400">raise</span> HTTPException(status_code=<span class="text-rose-300">404</span>, detail=<span class="text-amber-300">"Item not found"</span>)
+
+<span class="text-slate-500">@app.put("/items/{item_id}")</span>
+<span class="text-indigo-400">def</span> <span class="text-sky-300">replace_item</span>(item_id: int, data: ItemUpdate):
+    <span class="text-slate-500">"""Full replace — all fields required in practice."""</span>
+    idx, _ = find_item(item_id)
+    updated = {<span class="text-amber-300">"id"</span>: item_id, **data.model_dump(exclude_unset=<span class="text-indigo-400">True</span>)}
+    items_db[idx] = updated
+    <span class="text-indigo-400">return</span> updated
+
+<span class="text-slate-500">@app.patch("/items/{item_id}")</span>
+<span class="text-indigo-400">def</span> <span class="text-sky-300">patch_item</span>(item_id: int, data: ItemUpdate):
+    <span class="text-slate-500">"""Partial update — only sent fields change."""</span>
+    idx, item = find_item(item_id)
+    patch_data = data.model_dump(exclude_unset=<span class="text-indigo-400">True</span>)
+    items_db[idx] = {**item, **patch_data}
+    <span class="text-indigo-400">return</span> items_db[idx]
+
+<span class="text-slate-500">@app.delete("/items/{item_id}", status_code=204)</span>
+<span class="text-indigo-400">def</span> <span class="text-sky-300">delete_item</span>(item_id: int):
+    idx, _ = find_item(item_id)
+    items_db.pop(idx)
+    <span class="text-indigo-400">return</span> <span class="text-indigo-400">None</span></code></pre>
+          </div>
+
+          <div class="rounded-2xl p-4 mb-6 text-sm bg-gradient-to-r from-amber-500/5 to-rose-500/5 border border-white/10 space-y-2">
+            <p class="text-slate-300 font-medium mb-2 flex items-center gap-2"><span class="text-base">🚀</span> Try it</p>
+            <code class="font-mono text-emerald-300 block bg-slate-900/60 rounded-lg px-3 py-2 border border-white/5">curl -X PATCH http://localhost:8000/items/1 -H "Content-Type: application/json" -d '{"price": 899.99}'</code>
+            <code class="font-mono text-emerald-300 block bg-slate-900/60 rounded-lg px-3 py-2 border border-white/5">curl -X DELETE http://localhost:8000/items/1</code>
+          </div>
+          <div id="quiz-edit-delete-endpoints" class="quiz-section" data-section="edit-delete-endpoints"></div>
+          </div>
+        </section>
+
+        <!-- Section 10: Production & CI/CD for APIs -->
+        <section id="production-cicd" class="scroll-mt-24 mb-20 reveal-section">
+          <div class="glass-card rounded-3xl p-6 sm:p-8 gradient-border">
+          <div class="flex items-center gap-4 mb-6">
+            <span class="flex-shrink-0 w-12 h-12 rounded-2xl bg-gradient-to-br from-rose-500/30 to-pink-600/20 border border-rose-400/30 flex items-center justify-center font-display font-bold text-rose-200 text-lg">10</span>
+            <div>
+              <p class="text-[10px] uppercase tracking-[0.2em] text-slate-500 mb-0.5">Ship it</p>
+              <h2 class="font-display text-2xl sm:text-3xl font-bold text-white">Production, Testing &amp; CI/CD</h2>
+            </div>
+          </div>
+          <p class="text-slate-400 mb-4 leading-relaxed">
+            A complete microservice isn't just endpoints — it needs tests, containers, and automated deployment.
+          </p>
+
+          <h3 class="font-display text-lg font-semibold text-white mb-3 flex items-center gap-2"><span class="w-1.5 h-5 rounded-full bg-emerald-500"></span>Example pytest test</h3>
+          <div class="code-window rounded-2xl overflow-hidden mb-6">
+            <div class="flex items-center gap-2 px-4 py-2.5 border-b border-white/5 bg-slate-900/80">
+              <div class="dots flex gap-1.5"><span class="bg-rose-500"></span><span class="bg-amber-400"></span><span class="bg-emerald-500"></span></div>
+              <span class="text-[11px] text-slate-500 font-mono ml-2">test_main.py</span>
+            </div>
+            <pre class="p-4 text-sm overflow-x-auto"><code class="font-mono text-slate-300"><span class="text-indigo-400">from</span> fastapi.testclient <span class="text-indigo-400">import</span> TestClient
+<span class="text-indigo-400">from</span> main <span class="text-indigo-400">import</span> app
+
+client = TestClient(app)
+
+<span class="text-indigo-400">def</span> <span class="text-sky-300">test_read_items</span>():
+    response = client.get(<span class="text-amber-300">"/items"</span>)
+    <span class="text-indigo-400">assert</span> response.status_code == <span class="text-rose-300">200</span>
+    <span class="text-indigo-400">assert</span> isinstance(response.json(), list)</code></pre>
+          </div>
+
+          <h3 class="font-display text-lg font-semibold text-white mb-3 flex items-center gap-2"><span class="w-1.5 h-5 rounded-full bg-indigo-500"></span>GitHub Actions snippet</h3>
+          <div class="code-window rounded-2xl overflow-hidden mb-6">
+            <div class="flex items-center gap-2 px-4 py-2.5 border-b border-white/5 bg-slate-900/80">
+              <div class="dots flex gap-1.5"><span class="bg-rose-500"></span><span class="bg-amber-400"></span><span class="bg-emerald-500"></span></div>
+              <span class="text-[11px] text-slate-500 font-mono ml-2">.github/workflows/ci.yml</span>
+            </div>
+            <pre class="p-4 text-sm overflow-x-auto"><code class="font-mono text-slate-300"><span class="text-slate-500"># .github/workflows/ci.yml</span>
+<span class="text-indigo-400">name:</span> API CI
+<span class="text-indigo-400">on:</span> [push, pull_request]
+<span class="text-indigo-400">jobs:</span>
+  <span class="text-sky-300">test</span>:
+    <span class="text-indigo-400">runs-on:</span> ubuntu-latest
+    <span class="text-indigo-400">steps:</span>
+      - <span class="text-indigo-400">uses:</span> actions/checkout@v4
+      - <span class="text-indigo-400">uses:</span> actions/setup-python@v5
+        <span class="text-indigo-400">with:</span>
+          <span class="text-indigo-400">python-version:</span> <span class="text-amber-300">"3.12"</span>
+      - <span class="text-indigo-400">run:</span> pip install fastapi uvicorn pytest httpx
+      - <span class="text-indigo-400">run:</span> pytest</code></pre>
+          </div>
+
+          <div class="rounded-2xl p-5 mb-6 bg-gradient-to-br from-emerald-500/10 via-transparent to-indigo-500/10 border border-emerald-500/20">
+            <h3 class="font-display text-white font-semibold mb-3 flex items-center gap-2"><span>✨</span> Key takeaways</h3>
+            <ul class="text-slate-400 text-sm space-y-2.5">
+              <li class="flex items-start gap-2"><span class="text-emerald-400">→</span> APIs are contracts — document them (FastAPI does this automatically)</li>
+              <li class="flex items-start gap-2"><span class="text-emerald-400">→</span> Microservices communicate over HTTP/gRPC — design for failure</li>
+              <li class="flex items-start gap-2"><span class="text-emerald-400">→</span> Automate testing and deployment early — CI/CD saves hours later</li>
+              <li class="flex items-start gap-2"><span class="text-emerald-400">→</span> Start simple (monolith or few services), split when you have a clear reason</li>
+            </ul>
+          </div>
+          <div id="quiz-production-cicd" class="quiz-section" data-section="production-cicd"></div>
+          </div>
+        </section>
+
+        <footer class="mt-8 pt-10 pb-14 text-center">
+          <div class="glass-card rounded-3xl p-8 gradient-border">
+            <p class="font-display text-lg font-semibold text-white mb-1">You're all set!</p>
+            <p class="text-slate-500 text-sm">Microservices &amp; APIs Tutorial — built for learning. Happy coding! 🎉</p>
+          </div>
+        </footer>
+      </div>
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
