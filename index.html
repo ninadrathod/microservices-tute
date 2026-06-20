@@ -139,6 +139,13 @@
       pointer-events: none;
       z-index: 0;
     }
+
+    .response-panel { border: 1px solid rgba(148, 163, 184, 0.1); }
+    .status-ok { background: rgba(16, 185, 129, 0.12); color: #6ee7b7; border: 1px solid rgba(52, 211, 153, 0.25); }
+    .status-created { background: rgba(99, 102, 241, 0.12); color: #a5b4fc; border: 1px solid rgba(99, 102, 241, 0.25); }
+    .status-empty { background: rgba(148, 163, 184, 0.12); color: #cbd5e1; border: 1px solid rgba(148, 163, 184, 0.25); }
+    .status-client-err { background: rgba(251, 191, 36, 0.12); color: #fcd34d; border: 1px solid rgba(251, 191, 36, 0.25); }
+    .status-not-found { background: rgba(251, 113, 133, 0.12); color: #fda4af; border: 1px solid rgba(251, 113, 133, 0.25); }
   </style>
 </head>
 <body class="mesh-bg text-slate-200 antialiased relative overflow-x-hidden">
@@ -636,8 +643,80 @@ items_db = [
 
           <div class="rounded-2xl p-4 mb-6 text-sm bg-gradient-to-r from-emerald-500/5 to-indigo-500/5 border border-white/10">
             <p class="text-slate-300 font-medium mb-2 flex items-center gap-2"><span class="text-base">🚀</span> Try it</p>
-            <code class="font-mono text-emerald-300 block mt-1 bg-slate-900/60 rounded-lg px-3 py-2 border border-white/5">curl http://localhost:8000/items</code>
-            <code class="font-mono text-emerald-300 block mt-2 bg-slate-900/60 rounded-lg px-3 py-2 border border-white/5">curl http://localhost:8000/items/1</code>
+            <code class="font-mono text-emerald-300 block mt-1 bg-slate-900/60 rounded-lg px-3 py-2 border border-white/5">curl -i http://localhost:8000/items</code>
+            <code class="font-mono text-emerald-300 block mt-2 bg-slate-900/60 rounded-lg px-3 py-2 border border-white/5">curl -i http://localhost:8000/items/1</code>
+          </div>
+
+          <h3 class="font-display text-lg font-semibold text-white mb-3 flex items-center gap-2"><span class="w-1.5 h-5 rounded-full bg-sky-500"></span>What the client receives</h3>
+          <p class="text-slate-400 text-sm mb-4 leading-relaxed">
+            The <strong class="text-slate-200">client</strong> (browser, mobile app, or <code class="font-mono text-indigo-300">curl</code>) gets an
+            <strong class="text-slate-200">HTTP status code</strong> plus a <strong class="text-slate-200">JSON body</strong>. Use
+            <code class="font-mono text-indigo-300">curl -i</code> to see headers and body together.
+          </p>
+
+          <div class="space-y-4 mb-6">
+            <div class="response-panel rounded-2xl overflow-hidden bg-slate-900/40">
+              <div class="flex flex-wrap items-center gap-2 px-4 py-2.5 border-b border-white/5 bg-slate-900/60">
+                <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded status-ok">200 OK</span>
+                <code class="text-[11px] font-mono text-slate-400">GET /items</code>
+                <span class="text-[10px] text-slate-500 ml-auto">Success — list all items</span>
+              </div>
+              <pre class="p-4 text-xs sm:text-sm overflow-x-auto"><code class="font-mono text-slate-300">[
+  { <span class="text-amber-300">"id"</span>: <span class="text-rose-300">1</span>, <span class="text-amber-300">"name"</span>: <span class="text-amber-300">"Laptop"</span>, <span class="text-amber-300">"price"</span>: <span class="text-rose-300">999.99</span> },
+  { <span class="text-amber-300">"id"</span>: <span class="text-rose-300">2</span>, <span class="text-amber-300">"name"</span>: <span class="text-amber-300">"Mouse"</span>, <span class="text-amber-300">"price"</span>: <span class="text-rose-300">29.99</span> }
+]</code></pre>
+            </div>
+
+            <div class="response-panel rounded-2xl overflow-hidden bg-slate-900/40">
+              <div class="flex flex-wrap items-center gap-2 px-4 py-2.5 border-b border-white/5 bg-slate-900/60">
+                <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded status-ok">200 OK</span>
+                <code class="text-[11px] font-mono text-slate-400">GET /items/1</code>
+                <span class="text-[10px] text-slate-500 ml-auto">Success — single item</span>
+              </div>
+              <pre class="p-4 text-xs sm:text-sm overflow-x-auto"><code class="font-mono text-slate-300">{
+  <span class="text-amber-300">"id"</span>: <span class="text-rose-300">1</span>,
+  <span class="text-amber-300">"name"</span>: <span class="text-amber-300">"Laptop"</span>,
+  <span class="text-amber-300">"price"</span>: <span class="text-rose-300">999.99</span>
+}</code></pre>
+            </div>
+
+            <div class="response-panel rounded-2xl overflow-hidden bg-slate-900/40">
+              <div class="flex flex-wrap items-center gap-2 px-4 py-2.5 border-b border-white/5 bg-slate-900/60">
+                <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded status-not-found">404 Not Found</span>
+                <code class="text-[11px] font-mono text-slate-400">GET /items/999</code>
+                <span class="text-[10px] text-slate-500 ml-auto">Item does not exist</span>
+              </div>
+              <pre class="p-4 text-xs sm:text-sm overflow-x-auto"><code class="font-mono text-slate-300">{
+  <span class="text-amber-300">"detail"</span>: <span class="text-amber-300">"Item not found"</span>
+}</code></pre>
+              <p class="px-4 pb-3 text-[11px] text-slate-500">Raised by <code class="font-mono text-rose-300">HTTPException(status_code=404, ...)</code> in your route.</p>
+            </div>
+
+            <div class="response-panel rounded-2xl overflow-hidden bg-slate-900/40">
+              <div class="flex flex-wrap items-center gap-2 px-4 py-2.5 border-b border-white/5 bg-slate-900/60">
+                <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded status-client-err">422 Unprocessable Entity</span>
+                <code class="text-[11px] font-mono text-slate-400">GET /items/abc</code>
+                <span class="text-[10px] text-slate-500 ml-auto">Bad request — invalid path param</span>
+              </div>
+              <pre class="p-4 text-xs sm:text-sm overflow-x-auto"><code class="font-mono text-slate-300">{
+  <span class="text-amber-300">"detail"</span>: [
+    {
+      <span class="text-amber-300">"type"</span>: <span class="text-amber-300">"int_parsing"</span>,
+      <span class="text-amber-300">"loc"</span>: [<span class="text-amber-300">"path"</span>, <span class="text-amber-300">"item_id"</span>],
+      <span class="text-amber-300">"msg"</span>: <span class="text-amber-300">"Input should be a valid integer..."</span>,
+      <span class="text-amber-300">"input"</span>: <span class="text-amber-300">"abc"</span>
+    }
+  ]
+}</code></pre>
+              <p class="px-4 pb-3 text-[11px] text-slate-500">FastAPI auto-validates <code class="font-mono text-amber-300">item_id: int</code> — non-numeric IDs are rejected before your function runs.</p>
+            </div>
+          </div>
+
+          <div class="rounded-2xl p-4 mb-6 text-sm bg-indigo-500/5 border border-indigo-500/20">
+            <p class="text-slate-300 leading-relaxed"><strong class="text-indigo-300">Client tip:</strong> In JavaScript,
+            <code class="font-mono text-indigo-300">const res = await fetch('/items/1')</code> then
+            <code class="font-mono text-indigo-300">const data = await res.json()</code> gives you the object above.
+            Check <code class="font-mono text-indigo-300">res.ok</code> or <code class="font-mono text-indigo-300">res.status</code> before assuming success.</p>
           </div>
           <div id="quiz-get-endpoints" class="quiz-section" data-section="get-endpoints"></div>
           </div>
@@ -688,9 +767,71 @@ next_id = <span class="text-rose-300">1</span>
 
           <div class="rounded-2xl p-4 mb-6 text-sm bg-gradient-to-r from-indigo-500/5 to-violet-500/5 border border-white/10">
             <p class="text-slate-300 font-medium mb-2 flex items-center gap-2"><span class="text-base">🚀</span> Try it</p>
-            <code class="font-mono text-emerald-300 block mt-1 bg-slate-900/60 rounded-lg px-3 py-2 border border-white/5 whitespace-pre-wrap">curl -X POST http://localhost:8000/items \
+            <code class="font-mono text-emerald-300 block mt-1 bg-slate-900/60 rounded-lg px-3 py-2 border border-white/5 whitespace-pre-wrap">curl -i -X POST http://localhost:8000/items \
   -H "Content-Type: application/json" \
   -d '{"name": "Keyboard", "price": 79.99}'</code>
+          </div>
+
+          <h3 class="font-display text-lg font-semibold text-white mb-3 flex items-center gap-2"><span class="w-1.5 h-5 rounded-full bg-sky-500"></span>What the client receives</h3>
+          <p class="text-slate-400 text-sm mb-4 leading-relaxed">
+            On success, the client gets <strong class="text-slate-200">201 Created</strong> and the new record (including the
+            server-assigned <code class="font-mono text-indigo-300">id</code>). On bad input, FastAPI returns
+            <strong class="text-slate-200">422</strong> with a structured list of validation errors.
+          </p>
+
+          <div class="space-y-4 mb-6">
+            <div class="response-panel rounded-2xl overflow-hidden bg-slate-900/40">
+              <div class="flex flex-wrap items-center gap-2 px-4 py-2.5 border-b border-white/5 bg-slate-900/60">
+                <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded status-created">201 Created</span>
+                <code class="text-[11px] font-mono text-slate-400">POST /items</code>
+                <span class="text-[10px] text-slate-500 ml-auto">Success — item created</span>
+              </div>
+              <pre class="p-4 text-xs sm:text-sm overflow-x-auto"><code class="font-mono text-slate-300">{
+  <span class="text-amber-300">"id"</span>: <span class="text-rose-300">1</span>,
+  <span class="text-amber-300">"name"</span>: <span class="text-amber-300">"Keyboard"</span>,
+  <span class="text-amber-300">"price"</span>: <span class="text-rose-300">79.99</span>
+}</code></pre>
+              <p class="px-4 pb-3 text-[11px] text-slate-500">The client can read <code class="font-mono text-indigo-300">id</code> from the response and immediately call <code class="font-mono text-indigo-300">GET /items/1</code>.</p>
+            </div>
+
+            <div class="response-panel rounded-2xl overflow-hidden bg-slate-900/40">
+              <div class="flex flex-wrap items-center gap-2 px-4 py-2.5 border-b border-white/5 bg-slate-900/60">
+                <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded status-client-err">422 Unprocessable Entity</span>
+                <code class="text-[11px] font-mono text-slate-400">POST /items</code>
+                <span class="text-[10px] text-slate-500 ml-auto">Missing required field</span>
+              </div>
+              <p class="px-4 pt-3 text-[11px] font-mono text-slate-500">Request body: <code class="text-rose-300">{"name": "Keyboard"}</code> — no <code class="text-amber-300">price</code></p>
+              <pre class="p-4 text-xs sm:text-sm overflow-x-auto"><code class="font-mono text-slate-300">{
+  <span class="text-amber-300">"detail"</span>: [
+    {
+      <span class="text-amber-300">"type"</span>: <span class="text-amber-300">"missing"</span>,
+      <span class="text-amber-300">"loc"</span>: [<span class="text-amber-300">"body"</span>, <span class="text-amber-300">"price"</span>],
+      <span class="text-amber-300">"msg"</span>: <span class="text-amber-300">"Field required"</span>,
+      <span class="text-amber-300">"input"</span>: { <span class="text-amber-300">"name"</span>: <span class="text-amber-300">"Keyboard"</span> }
+    }
+  ]
+}</code></pre>
+            </div>
+
+            <div class="response-panel rounded-2xl overflow-hidden bg-slate-900/40">
+              <div class="flex flex-wrap items-center gap-2 px-4 py-2.5 border-b border-white/5 bg-slate-900/60">
+                <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded status-client-err">422 Unprocessable Entity</span>
+                <code class="text-[11px] font-mono text-slate-400">POST /items</code>
+                <span class="text-[10px] text-slate-500 ml-auto">Wrong data type</span>
+              </div>
+              <p class="px-4 pt-3 text-[11px] font-mono text-slate-500">Request body: <code class="text-rose-300">{"name": "Keyboard", "price": "free"}</code></p>
+              <pre class="p-4 text-xs sm:text-sm overflow-x-auto"><code class="font-mono text-slate-300">{
+  <span class="text-amber-300">"detail"</span>: [
+    {
+      <span class="text-amber-300">"type"</span>: <span class="text-amber-300">"float_parsing"</span>,
+      <span class="text-amber-300">"loc"</span>: [<span class="text-amber-300">"body"</span>, <span class="text-amber-300">"price"</span>],
+      <span class="text-amber-300">"msg"</span>: <span class="text-amber-300">"Input should be a valid number..."</span>,
+      <span class="text-amber-300">"input"</span>: <span class="text-amber-300">"free"</span>
+    }
+  ]
+}</code></pre>
+              <p class="px-4 pb-3 text-[11px] text-slate-500">Pydantic enforces <code class="font-mono text-amber-300">price: float</code> — strings that are not valid numbers are rejected.</p>
+            </div>
           </div>
           <div id="quiz-post-endpoints" class="quiz-section" data-section="post-endpoints"></div>
           </div>
@@ -764,8 +905,73 @@ items_db = [{<span class="text-amber-300">"id"</span>: <span class="text-rose-30
 
           <div class="rounded-2xl p-4 mb-6 text-sm bg-gradient-to-r from-amber-500/5 to-rose-500/5 border border-white/10 space-y-2">
             <p class="text-slate-300 font-medium mb-2 flex items-center gap-2"><span class="text-base">🚀</span> Try it</p>
-            <code class="font-mono text-emerald-300 block bg-slate-900/60 rounded-lg px-3 py-2 border border-white/5">curl -X PATCH http://localhost:8000/items/1 -H "Content-Type: application/json" -d '{"price": 899.99}'</code>
-            <code class="font-mono text-emerald-300 block bg-slate-900/60 rounded-lg px-3 py-2 border border-white/5">curl -X DELETE http://localhost:8000/items/1</code>
+            <code class="font-mono text-emerald-300 block bg-slate-900/60 rounded-lg px-3 py-2 border border-white/5">curl -i -X PATCH http://localhost:8000/items/1 -H "Content-Type: application/json" -d '{"price": 899.99}'</code>
+            <code class="font-mono text-emerald-300 block bg-slate-900/60 rounded-lg px-3 py-2 border border-white/5">curl -i -X DELETE http://localhost:8000/items/1</code>
+          </div>
+
+          <h3 class="font-display text-lg font-semibold text-white mb-3 flex items-center gap-2"><span class="w-1.5 h-5 rounded-full bg-sky-500"></span>What the client receives</h3>
+          <p class="text-slate-400 text-sm mb-4 leading-relaxed">
+            Updates return the <strong class="text-slate-200">full updated object</strong> (200 OK). Deletes often return
+            <strong class="text-slate-200">204 No Content</strong> with an empty body. Missing resources and invalid input
+            produce clear error JSON — same patterns as GET and POST.
+          </p>
+
+          <div class="space-y-4 mb-6">
+            <div class="response-panel rounded-2xl overflow-hidden bg-slate-900/40">
+              <div class="flex flex-wrap items-center gap-2 px-4 py-2.5 border-b border-white/5 bg-slate-900/60">
+                <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded status-ok">200 OK</span>
+                <code class="text-[11px] font-mono text-slate-400">PATCH /items/1</code>
+                <span class="text-[10px] text-slate-500 ml-auto">Success — partial update</span>
+              </div>
+              <p class="px-4 pt-3 text-[11px] font-mono text-slate-500">Request body: <code class="text-emerald-300">{"price": 899.99}</code></p>
+              <pre class="p-4 text-xs sm:text-sm overflow-x-auto"><code class="font-mono text-slate-300">{
+  <span class="text-amber-300">"id"</span>: <span class="text-rose-300">1</span>,
+  <span class="text-amber-300">"name"</span>: <span class="text-amber-300">"Laptop"</span>,
+  <span class="text-amber-300">"price"</span>: <span class="text-rose-300">899.99</span>
+}</code></pre>
+              <p class="px-4 pb-3 text-[11px] text-slate-500"><code class="font-mono text-amber-300">name</code> unchanged; only <code class="font-mono text-amber-300">price</code> was patched.</p>
+            </div>
+
+            <div class="response-panel rounded-2xl overflow-hidden bg-slate-900/40">
+              <div class="flex flex-wrap items-center gap-2 px-4 py-2.5 border-b border-white/5 bg-slate-900/60">
+                <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded status-empty">204 No Content</span>
+                <code class="text-[11px] font-mono text-slate-400">DELETE /items/1</code>
+                <span class="text-[10px] text-slate-500 ml-auto">Success — item removed</span>
+              </div>
+              <pre class="p-4 text-xs sm:text-sm overflow-x-auto"><code class="font-mono text-slate-500">(empty response body)</code></pre>
+              <p class="px-4 pb-3 text-[11px] text-slate-500">In JavaScript: <code class="font-mono text-indigo-300">res.status === 204</code> means success with nothing to parse via <code class="font-mono text-indigo-300">.json()</code>.</p>
+            </div>
+
+            <div class="response-panel rounded-2xl overflow-hidden bg-slate-900/40">
+              <div class="flex flex-wrap items-center gap-2 px-4 py-2.5 border-b border-white/5 bg-slate-900/60">
+                <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded status-not-found">404 Not Found</span>
+                <code class="text-[11px] font-mono text-slate-400">PATCH /items/42</code>
+                <span class="text-[10px] text-slate-500 ml-auto">Item does not exist</span>
+              </div>
+              <pre class="p-4 text-xs sm:text-sm overflow-x-auto"><code class="font-mono text-slate-300">{
+  <span class="text-amber-300">"detail"</span>: <span class="text-amber-300">"Item not found"</span>
+}</code></pre>
+              <p class="px-4 pb-3 text-[11px] text-slate-500">Same JSON shape for <code class="font-mono text-rose-300">DELETE /items/42</code> when the ID is missing.</p>
+            </div>
+
+            <div class="response-panel rounded-2xl overflow-hidden bg-slate-900/40">
+              <div class="flex flex-wrap items-center gap-2 px-4 py-2.5 border-b border-white/5 bg-slate-900/60">
+                <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded status-client-err">422 Unprocessable Entity</span>
+                <code class="text-[11px] font-mono text-slate-400">PATCH /items/1</code>
+                <span class="text-[10px] text-slate-500 ml-auto">Invalid body type</span>
+              </div>
+              <p class="px-4 pt-3 text-[11px] font-mono text-slate-500">Request body: <code class="text-rose-300">{"price": "cheap"}</code></p>
+              <pre class="p-4 text-xs sm:text-sm overflow-x-auto"><code class="font-mono text-slate-300">{
+  <span class="text-amber-300">"detail"</span>: [
+    {
+      <span class="text-amber-300">"type"</span>: <span class="text-amber-300">"float_parsing"</span>,
+      <span class="text-amber-300">"loc"</span>: [<span class="text-amber-300">"body"</span>, <span class="text-amber-300">"price"</span>],
+      <span class="text-amber-300">"msg"</span>: <span class="text-amber-300">"Input should be a valid number..."</span>,
+      <span class="text-amber-300">"input"</span>: <span class="text-amber-300">"cheap"</span>
+    }
+  ]
+}</code></pre>
+            </div>
           </div>
           <div id="quiz-edit-delete-endpoints" class="quiz-section" data-section="edit-delete-endpoints"></div>
           </div>
