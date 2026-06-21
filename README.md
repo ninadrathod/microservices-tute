@@ -1,13 +1,13 @@
 # Microservices & APIs Tutorial
 
-A single-page, beginner-friendly tutorial covering APIs, REST, microservices, CI/CD automation, and hands-on **FastAPI** + **uvicorn** examples (GET, POST, PUT/PATCH, DELETE). Includes **100 interactive MCQs** with explanations.
+A single-page, beginner-friendly tutorial covering APIs, REST, microservices, CI/CD automation, and hands-on **FastAPI** + **uvicorn** examples (GET, POST, PUT/PATCH, DELETE). Includes **110 interactive MCQs** with explanations.
 
 Live site structure:
 
 | File | Purpose |
 |------|---------|
 | `index.html` | Tutorial content, SVG diagrams, quiz containers |
-| `script.js` | Navigation, mobile menu, 100 MCQs rendered as accordion cards |
+| `script.js` | Navigation, mobile menu, 110 MCQs rendered as accordion cards |
 | `CNAME` | Custom domain for GitHub Pages (optional) |
 
 ---
@@ -92,7 +92,7 @@ Or use the [Live Server](https://marketplace.visualstudio.com/items?itemName=rit
 ```
 microservices-tute/
 ├── index.html      # Tutorial page (Tailwind via CDN)
-├── script.js       # TOC, mobile nav, 100 MCQs
+├── script.js       # TOC, mobile nav, 110 MCQs
 ├── CNAME           # Custom domain placeholder
 └── README.md       # This file
 ```

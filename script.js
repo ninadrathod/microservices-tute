@@ -1,5 +1,5 @@
 /**
- * Microservices & APIs Tutorial — navigation, TOC, and 100 MCQs (10 per section).
+ * Microservices & APIs Tutorial — navigation, TOC, and 110 MCQs (10 per section).
  * Correct answers are evenly distributed across positions A–D (25 each).
  */
 
@@ -14,9 +14,10 @@ const SECTIONS = [
   { id: 'post-endpoints', label: '8. POST Endpoints' },
   { id: 'edit-delete-endpoints', label: '9. PUT/PATCH & DELETE' },
   { id: 'production-cicd', label: '10. Production & CI/CD' },
+  { id: 'curl-guide', label: '11. Understanding curl' },
 ];
 
-/** correctIndex in data; renderQuizzes rebalances to 25 per letter (A–D) across all 100. */
+/** correctIndex in data; renderQuizzes rebalances answers evenly across A–D. */
 const QUIZ_DATA = {
   prerequisites: [
     {
@@ -645,6 +646,69 @@ const QUIZ_DATA = {
       options: ['Microservices are illegal', 'You learn domain boundaries before splitting services', 'Monoliths cannot use APIs', 'CI/CD only works on monoliths'],
       correctIndex: 1,
       explanation: 'Premature splitting adds complexity. Evolve toward microservices when clear benefits emerge.',
+    },
+  ],
+
+  'curl-guide': [
+    {
+      q: 'In simple terms, curl is a tool that:',
+      options: ['Sends HTTP requests to URLs from the terminal', 'Compiles Python to machine code', 'Designs HTML layouts', 'Manages Git branches only'],
+      correctIndex: 0,
+      explanation: 'curl is a command-line HTTP client — it calls APIs and URLs without needing a browser or custom app.',
+    },
+    {
+      q: 'If you run curl with only a URL and no -X flag, the default HTTP method is:',
+      options: ['DELETE', 'GET', 'PATCH', 'POST'],
+      correctIndex: 1,
+      explanation: 'curl defaults to GET when -X is omitted — the same method browsers use when you visit a link.',
+    },
+    {
+      q: 'The -H flag in curl is used to:',
+      options: ['Hide all output', 'Delete server files', 'Add an HTTP header such as Content-Type', 'Change the TCP port number'],
+      correctIndex: 2,
+      explanation: '-H "Name: value" attaches request headers. Content-Type: application/json tells the server the body is JSON.',
+    },
+    {
+      q: 'The -d flag attaches:',
+      options: ['A database password', 'The server hostname', 'Response headers only', 'Request body data (often JSON)'],
+      correctIndex: 3,
+      explanation: '-d sends data in the request body — essential for POST/PATCH when creating or updating resources.',
+    },
+    {
+      q: 'Using -i with curl shows:',
+      options: ['Response headers plus the body', 'Only error messages', 'Python source code', 'Nothing — it silences output'],
+      correctIndex: 0,
+      explanation: '-i (include) prints the status line and response headers before the body — ideal for seeing 200 vs 404 vs 422.',
+    },
+    {
+      q: 'Why use quotes around a URL like curl "http://...?skip=0&limit=5"?',
+      options: ['To make the request faster', 'So the shell does not misinterpret special characters like &', 'Because curl requires HTTPS only', 'To encrypt the JSON body'],
+      correctIndex: 1,
+      explanation: 'In bash/zsh, & runs commands in the background. Quoting the URL keeps the query string intact.',
+    },
+    {
+      q: '-X POST in a curl command means:',
+      options: ['Print headers only', 'Download a file', 'Use the POST HTTP method to create data', 'Pause for 10 seconds'],
+      correctIndex: 2,
+      explanation: '-X selects the HTTP verb. POST is used to submit a body and create a new resource on the server.',
+    },
+    {
+      q: 'A successful DELETE in this tutorial often returns:',
+      options: ['201 with a JSON array', '422 with validation errors', '500 always', '204 No Content with an empty body'],
+      correctIndex: 3,
+      explanation: '204 means success with no response body — curl -i still shows the status line even when the body is empty.',
+    },
+    {
+      q: 'Content-Type: application/json tells the API server:',
+      options: ['The request body is JSON text to parse', 'To return HTML instead', 'To skip authentication', 'To delete all records'],
+      correctIndex: 0,
+      explanation: 'Headers describe the request. This one lets FastAPI/Pydantic parse -d payload as JSON.',
+    },
+    {
+      q: 'The backslash \\ at the end of a terminal line in a curl command:',
+      options: ['Deletes the previous flag', 'Continues the command on the next line for readability', 'Forces HTTPS', 'Cancels the request'],
+      correctIndex: 1,
+      explanation: 'Line continuation lets you split long curl commands across multiple lines without changing what curl sends.',
     },
   ],
 };
