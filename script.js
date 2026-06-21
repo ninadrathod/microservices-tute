@@ -687,10 +687,10 @@ const QUIZ_DATA = {
       explanation: 'In bash/zsh, & runs commands in the background. Quoting the URL keeps the query string intact.',
     },
     {
-      q: '-X POST in a curl command means:',
-      options: ['Print headers only', 'Download a file', 'Use the POST HTTP method to create data', 'Pause for 10 seconds'],
-      correctIndex: 2,
-      explanation: '-X selects the HTTP verb. POST is used to submit a body and create a new resource on the server.',
+      q: 'Regarding the order of flags and the URL in curl:',
+      options: ['The URL must always be the very last argument', 'Flags and URL can usually be reordered; both Style A and Style B work', 'The URL must come immediately after curl with no flags in between', '-d must always appear before -H'],
+      correctIndex: 1,
+      explanation: 'curl accepts flexible argument order. You can place the URL after all flags or before trailing -H/-d flags — the HTTP request is the same.',
     },
     {
       q: 'A successful DELETE in this tutorial often returns:',

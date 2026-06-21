@@ -1065,33 +1065,69 @@ client = TestClient(app)
           </p>
 
           <!-- curl anatomy diagram -->
-          <figure class="glass-card rounded-2xl p-6 mb-8 gradient-border">
-            <figcaption class="text-[10px] uppercase tracking-[0.2em] text-indigo-400/70 mb-4 font-medium">Anatomy of a curl command</figcaption>
-            <svg viewBox="0 0 640 200" class="w-full h-auto" role="img" aria-label="Diagram breaking down parts of a curl command">
-              <rect x="20" y="70" width="70" height="44" rx="8" fill="#312e81" stroke="#818cf8" stroke-width="2"/>
-              <text x="55" y="97" text-anchor="middle" fill="#c7d2fe" font-size="13" font-weight="700">curl</text>
-              <text x="55" y="130" text-anchor="middle" fill="#64748b" font-size="9">the program</text>
-              <rect x="110" y="70" width="55" height="44" rx="8" fill="#422006" stroke="#fbbf24"/>
-              <text x="137" y="97" text-anchor="middle" fill="#fcd34d" font-size="12" font-weight="600">-i</text>
-              <text x="137" y="130" text-anchor="middle" fill="#64748b" font-size="9">flags</text>
-              <rect x="185" y="70" width="70" height="44" rx="8" fill="#422006" stroke="#fbbf24"/>
-              <text x="220" y="97" text-anchor="middle" fill="#fcd34d" font-size="12" font-weight="600">-X POST</text>
-              <rect x="275" y="70" width="55" height="44" rx="8" fill="#422006" stroke="#fbbf24"/>
-              <text x="302" y="97" text-anchor="middle" fill="#fcd34d" font-size="11" font-weight="600">-H</text>
-              <rect x="350" y="70" width="55" height="44" rx="8" fill="#422006" stroke="#fbbf24"/>
-              <text x="377" y="97" text-anchor="middle" fill="#fcd34d" font-size="11" font-weight="600">-d</text>
-              <rect x="425" y="70" width="195" height="44" rx="8" fill="#064e3b" stroke="#34d399" stroke-width="2"/>
-              <text x="522" y="92" text-anchor="middle" fill="#6ee7b7" font-size="11" font-weight="600">http://localhost:8000/items</text>
-              <text x="522" y="108" text-anchor="middle" fill="#64748b" font-size="9">URL (required)</text>
-              <path d="M90 92 L110 92" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
-              <path d="M165 92 L185 92" stroke="#475569" stroke-width="2"/>
-              <path d="M255 92 L275 92" stroke="#475569" stroke-width="2"/>
-              <path d="M330 92 L350 92" stroke="#475569" stroke-width="2"/>
-              <path d="M405 92 L425 92" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
-              <text x="320" y="55" text-anchor="middle" fill="#94a3b8" font-size="10">Read left → right: program, options, destination</text>
-              <text x="320" y="175" text-anchor="middle" fill="#64748b" font-size="10">Flags are optional except the URL. Order of flags usually does not matter.</text>
+          <figure class="glass-card rounded-2xl p-6 mb-6 gradient-border">
+            <figcaption class="text-[10px] uppercase tracking-[0.2em] text-indigo-400/70 mb-4 font-medium">Parts of a curl command — two valid layouts</figcaption>
+            <svg viewBox="0 0 640 260" class="w-full h-auto" role="img" aria-label="Two valid orderings of curl flags and URL">
+              <text x="320" y="22" text-anchor="middle" fill="#94a3b8" font-size="10">Both send the same POST request — only the argument order on the command line differs</text>
+              <!-- Style A -->
+              <text x="24" y="48" fill="#6ee7b7" font-size="10" font-weight="600">Style A — flags first, URL last</text>
+              <rect x="20" y="58" width="52" height="36" rx="6" fill="#312e81" stroke="#818cf8"/>
+              <text x="46" y="81" text-anchor="middle" fill="#c7d2fe" font-size="11" font-weight="700">curl</text>
+              <rect x="82" y="58" width="44" height="36" rx="6" fill="#422006" stroke="#fbbf24"/>
+              <text x="104" y="81" text-anchor="middle" fill="#fcd34d" font-size="10">-i</text>
+              <rect x="136" y="58" width="58" height="36" rx="6" fill="#422006" stroke="#fbbf24"/>
+              <text x="165" y="81" text-anchor="middle" fill="#fcd34d" font-size="9">-X POST</text>
+              <rect x="204" y="58" width="40" height="36" rx="6" fill="#422006" stroke="#fbbf24"/>
+              <text x="224" y="81" text-anchor="middle" fill="#fcd34d" font-size="10">-H</text>
+              <rect x="254" y="58" width="40" height="36" rx="6" fill="#422006" stroke="#fbbf24"/>
+              <text x="274" y="81" text-anchor="middle" fill="#fcd34d" font-size="10">-d</text>
+              <rect x="304" y="58" width="316" height="36" rx="6" fill="#064e3b" stroke="#34d399" stroke-width="2"/>
+              <text x="462" y="81" text-anchor="middle" fill="#6ee7b7" font-size="10">http://localhost:8000/items</text>
+              <!-- Style B -->
+              <text x="24" y="128" fill="#a5b4fc" font-size="10" font-weight="600">Style B — URL in the middle (also valid)</text>
+              <rect x="20" y="138" width="52" height="36" rx="6" fill="#312e81" stroke="#818cf8"/>
+              <text x="46" y="161" text-anchor="middle" fill="#c7d2fe" font-size="11" font-weight="700">curl</text>
+              <rect x="82" y="138" width="44" height="36" rx="6" fill="#422006" stroke="#fbbf24"/>
+              <text x="104" y="161" text-anchor="middle" fill="#fcd34d" font-size="10">-i</text>
+              <rect x="136" y="138" width="58" height="36" rx="6" fill="#422006" stroke="#fbbf24"/>
+              <text x="165" y="161" text-anchor="middle" fill="#fcd34d" font-size="9">-X POST</text>
+              <rect x="204" y="138" width="200" height="36" rx="6" fill="#064e3b" stroke="#34d399" stroke-width="2"/>
+              <text x="304" y="161" text-anchor="middle" fill="#6ee7b7" font-size="10">http://localhost:8000/items</text>
+              <rect x="414" y="138" width="40" height="36" rx="6" fill="#422006" stroke="#fbbf24"/>
+              <text x="434" y="161" text-anchor="middle" fill="#fcd34d" font-size="10">-H</text>
+              <rect x="464" y="138" width="40" height="36" rx="6" fill="#422006" stroke="#fbbf24"/>
+              <text x="484" y="161" text-anchor="middle" fill="#fcd34d" font-size="10">-d</text>
+              <text x="320" y="205" text-anchor="middle" fill="#64748b" font-size="10">Always start with curl · include exactly one URL · add whichever flags you need</text>
+              <text x="320" y="225" text-anchor="middle" fill="#64748b" font-size="10">Order of flags and URL placement is flexible — curl figures out what you mean</text>
             </svg>
           </figure>
+
+          <div class="rounded-2xl p-5 mb-8 bg-gradient-to-r from-amber-500/10 via-transparent to-cyan-500/10 border border-amber-500/25">
+            <h3 class="font-display text-white font-semibold mb-2 flex items-center gap-2"><span>↔️</span> Does the order matter?</h3>
+            <p class="text-slate-400 text-sm leading-relaxed mb-4">
+              <strong class="text-slate-200">Usually no.</strong> curl treats flags (<code class="font-mono text-amber-300">-X</code>,
+              <code class="font-mono text-amber-300">-H</code>, <code class="font-mono text-amber-300">-d</code>, <code class="font-mono text-amber-300">-i</code>, …)
+              and the <strong class="text-slate-200">URL</strong> as separate pieces of the same instruction. You can put the URL
+              <em>after all flags</em> (Style A) or <em>before</em> trailing flags like <code class="font-mono text-amber-300">-H</code> and
+              <code class="font-mono text-amber-300">-d</code> (Style B). The request sent over the network is identical.
+            </p>
+            <p class="text-slate-500 text-xs uppercase tracking-wider mb-2 font-semibold">Same POST — written two ways</p>
+            <div class="grid lg:grid-cols-2 gap-3 text-sm">
+              <div class="bg-slate-950/60 rounded-xl p-3 border border-white/5">
+                <p class="text-[10px] text-emerald-400 font-semibold mb-1.5">Style A (URL last)</p>
+                <code class="font-mono text-xs text-slate-300 leading-relaxed block">curl -i -X POST -H "Content-Type: application/json" -d '{"name":"Keyboard","price":79.99}' http://localhost:8000/items</code>
+              </div>
+              <div class="bg-slate-950/60 rounded-xl p-3 border border-white/5">
+                <p class="text-[10px] text-indigo-400 font-semibold mb-1.5">Style B (URL before -H / -d)</p>
+                <code class="font-mono text-xs text-slate-300 leading-relaxed block">curl -i -X POST http://localhost:8000/items -H "Content-Type: application/json" -d '{"name":"Keyboard","price":79.99}'</code>
+              </div>
+            </div>
+            <p class="text-slate-500 text-xs mt-3">
+              <strong class="text-slate-400">Why both appear in this tutorial:</strong> multi-line examples often put the URL right after
+              <code class="font-mono text-cyan-300">-X POST</code> so the next lines clearly attach headers and body to that address.
+              Single-line examples sometimes group all flags first. Pick whichever reads clearer to you.
+            </p>
+          </div>
 
           <h3 class="font-display text-lg font-semibold text-white mb-3 flex items-center gap-2"><span class="w-1.5 h-5 rounded-full bg-cyan-500"></span>Essential flags &amp; options</h3>
           <p class="text-slate-400 text-sm mb-4">Flags start with a hyphen (<code class="font-mono text-cyan-300">-</code>) or double hyphen (<code class="font-mono text-cyan-300">--</code>). They modify how curl behaves.</p>
@@ -1151,9 +1187,10 @@ client = TestClient(app)
   -d '{"name": "Keyboard", "price": 79.99}'</code></pre>
             <ul class="text-slate-400 text-sm space-y-2 list-none">
               <li><strong class="text-slate-200">-X POST</strong> — explicitly says “create something” (don’t just read).</li>
-              <li><strong class="text-slate-200">-H "Content-Type: application/json"</strong> — tells the server “the next part is JSON text.” Without this, FastAPI may not parse the body correctly.</li>
+              <li><strong class="text-slate-200">http://localhost:8000/items</strong> — the URL appears <em>before</em> <code class="font-mono text-amber-300">-H</code> and <code class="font-mono text-amber-300">-d</code> here (Style B). That is valid — you could also move the URL to the very end (Style A) and get the same result.</li>
+              <li><strong class="text-slate-200">-H "Content-Type: application/json"</strong> — tells the server “the body is JSON text.” Without this, FastAPI may not parse the body correctly.</li>
               <li><strong class="text-slate-200">-d '{...}'</strong> — the data payload (<strong class="text-slate-200">d</strong> = data). The single quotes wrap JSON so the shell doesn’t break on inner double quotes.</li>
-              <li>The backslash <code class="font-mono text-amber-300">\</code> at line ends continues the command on the next line — purely for readability in the terminal.</li>
+              <li>The backslash <code class="font-mono text-amber-300">\</code> at line ends continues the command on the next line — purely for readability; it does not change flag order rules.</li>
               <li>Expect <code class="font-mono text-indigo-300">201 Created</code> and JSON with the new <code class="font-mono">id</code>.</li>
             </ul>
           </div>
@@ -1167,7 +1204,7 @@ client = TestClient(app)
             <ul class="text-slate-400 text-sm space-y-2 list-none">
               <li><strong class="text-slate-200">-X PATCH</strong> — “change only what I send.” Here we update <code class="font-mono text-amber-300">price</code> only; <code class="font-mono text-amber-300">name</code> stays the same.</li>
               <li><strong class="text-slate-200">/items/1</strong> — the <code class="font-mono text-indigo-300">1</code> in the URL identifies which record to patch (path parameter).</li>
-              <li>Same <code class="font-mono text-amber-300">-H</code> and <code class="font-mono text-amber-300">-d</code> pattern as POST — headers describe the body; body carries the fields to change.</li>
+              <li>Again, <code class="font-mono text-amber-300">-H</code> and <code class="font-mono text-amber-300">-d</code> come <em>after</em> the URL in this layout — equivalent to putting them before the URL.</li>
             </ul>
           </div>
 
@@ -1201,7 +1238,7 @@ client = TestClient(app)
               <div class="bg-slate-900/50 rounded-xl p-3 border border-white/5"><strong class="text-amber-400">Update</strong> → <code class="font-mono text-slate-300">curl -X PATCH -H ... -d ... URL/id</code></div>
               <div class="bg-slate-900/50 rounded-xl p-3 border border-white/5"><strong class="text-rose-400">Delete</strong> → <code class="font-mono text-slate-300">curl -X DELETE URL/id</code></div>
             </div>
-            <p class="text-slate-500 text-xs mt-3">Tip: add <code class="font-mono text-cyan-300">-i</code> to any of the above when learning — it makes status codes visible.</p>
+            <p class="text-slate-500 text-xs mt-3">Tip: add <code class="font-mono text-cyan-300">-i</code> to any command when learning. For POST/PATCH, the URL can sit before or after <code class="font-mono text-cyan-300">-H</code> / <code class="font-mono text-cyan-300">-d</code>.</p>
           </div>
 
           <div id="quiz-curl-guide" class="quiz-section" data-section="curl-guide"></div>
