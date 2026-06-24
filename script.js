@@ -139,7 +139,7 @@ const QUIZ_DATA = {
     },
     {
       q: 'An interface in "Application Programming Interface" means:',
-      options: ['A graphical user interface only', 'A agreed-upon way to interact with something', 'A type of computer monitor', 'A keyboard layout'],
+      options: ['A graphical user interface only', 'An agreed-upon way to interact with something', 'A type of computer monitor', 'A keyboard layout'],
       correctIndex: 1,
       explanation: 'An interface defines how to interact with a system — which requests are allowed and what responses look like.',
     },
@@ -368,8 +368,8 @@ const QUIZ_DATA = {
     {
       q: 'In uvicorn main:app, "main" refers to:',
       options: ['The Python filename main.py (without .py)', 'The main() function only', 'The primary database', 'The CEO of the company'],
-      correctIndex: 1,
-      explanation: 'uvicorn takes module:app — the Python file module name and the FastAPI instance variable (usually app).',
+      correctIndex: 0,
+      explanation: 'uvicorn takes module:app — "main" is the Python module name (the main.py filename without .py), and "app" is the FastAPI instance variable inside it.',
     },
     {
       q: 'FastAPI uses ______ for request/response validation:',
@@ -620,8 +620,8 @@ const QUIZ_DATA = {
     {
       q: 'Production uvicorn should NOT use:',
       options: ['--reload (use a process manager instead)', 'A valid app module', 'HTTPS termination at a reverse proxy', 'Logging and monitoring'],
-      correctIndex: 1,
-      explanation: '--reload is for development only. Production uses gunicorn+uvicorn workers or similar with reload disabled.',
+      correctIndex: 0,
+      explanation: '--reload is for development only — it watches files and restarts the server. Production should use a process manager (e.g. gunicorn + uvicorn workers) with reload disabled.',
     },
     {
       q: 'API documentation in production should be:',
